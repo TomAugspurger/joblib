@@ -534,6 +534,8 @@ class Parallel(Logger):
             max_nbytes=max_nbytes,
             mmap_mode=mmap_mode,
             temp_folder=temp_folder,
+            prefer=prefer,
+            require=require,
             verbose=max(0, self.verbose - 50),
         )
         if DEFAULT_MP_CONTEXT is not None:
@@ -572,10 +574,6 @@ class Parallel(Logger):
                 % batch_size)
 
         self._backend = backend
-        # Store backend hints and constraints on the parallel instance to make
-        # them available to the backend itself.
-        self._require = require
-        self._prefer = prefer
         self._output = None
         self._jobs = list()
         self._managed_backend = False
@@ -597,8 +595,6 @@ class Parallel(Logger):
         """Build a process or thread pool and return the number of workers"""
         try:
             n_jobs = self._backend.configure(n_jobs=self.n_jobs, parallel=self,
-                                             prefer=self._prefer,
-                                             require=self._require,
                                              **self._backend_args)
             if self.timeout is not None and not self._backend.supports_timeout:
                 warnings.warn(
